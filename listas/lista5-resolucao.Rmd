@@ -72,7 +72,6 @@ modelo1 <- lm(Renda ~ sexo_dummy, data = data)
 $$
 Renda = \alpha + \beta_{1} X_{sexo}
 $$
-
 -   Inteprete os coeficientes
 
 O $\alpha$ (alpha) representa o ponto em que a nossa reta de regressão corta o eixo $Y$. Já o $\beta$ (coeficiente angular da reta) fornece a inclinação da reta. Assim, podemos interpretá-lo como o quanto em média $Y$ deve aumentar ou diminuir para cada aumento de uma unidade em $X$.
