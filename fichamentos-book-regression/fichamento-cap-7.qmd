@@ -1,0 +1,241 @@
+---
+title: "Fichamento Expositivo - Estimação (capítulo 7)"
+subtitle: "Livro: Galdino, Manoel. Estimação (capítulo 7). In: _______. Introdução à Regressão para Ciências Sociais"
+format: html
+editor: visual
+---
+
+::: {style="text-align: justify"}
+## Capítulo 7 - Estimação
+
+```{r pacotes, message=FALSE, warning=FALSE}
+# Pacotes utilizados ao longo do script
+library(tidyverse)
+library(knitr)
+library(MASS)
+```
+
+**Nota:** Este capítulo tem muitas fórmulas, mas não sei como reproduzi-las aqui no no Quarto.
+
+O preditor linear ótimo com um único regressor possui:
+
+-- Intercepto α = E\[Y\] - β \* E\[X\]\
+-- Inclinação β = cov(Y, X) / var(X)
+
+**O que isso significa?**
+
+Se "considerarmos o modelo de regressão $y~i~ = α + β * x~i~ + e~i~$ e usarmos essas fórmulas para calcular os valores de α e β em uma população, obteríamos uma reta ajustada que é o melhor preditor linear".
+
+Conforme lidamos com uma amostra *como se fosse* uma popualção, para facilitar as demonstrações, foi deixado de lado como funciona "a estimação de uma regressão a partir de uma amostra". Mas isso será visto agora.
+
+## 7.1 Plug-in estimators
+
+"Se tivermos uma amostra, e não a população, é razoável pensar que uma boa estimativa para os valores populacionais de α e β são justamente essas fórmulas, calculadas para os dados amostrais".
+
+**Plug-in estimates** é o nome dado ao estimador dos parÂmetros populacionais.
+
+É comum usar as letras gragas com "chapéu" para representar estimativas amostrais de valores populacionais ou letras latinhas \$ b \$.
+
+## 7.2 Simulação de uma Normal Bivariada
+
+**Nota:** A partir desse ponto, vou tilizar o R somente para reproduzir os scripts. Talvez eu deixe de utilizar o Quarto.
+
+##### Definindo os parâmetros da Normal Bivariada
+
+```{r, message=FALSE, warning=FALSE}
+# Vetor de médias
+vetor_media <- c(0,0) # mesmo que as médias sejam iguais, é preciso representá-las em vetores
+
+# Definindo sigma (letra grega para o desvio padrão/variância)
+sigma_x <- 2 
+sigma_y <- 2
+
+rho <- .6
+
+# Criando a matriz (segundo parâmetro)
+matriz_var_cov <- matrix(
+  # Valores para o segundo parâmetro (sigma grande) da Normal Bivariada
+  c(sigma_x^2, rho*sigma_x*sigma_y, rho*sigma_x*sigma_y,  sigma_y^2 ), 
+  # Começa prencheendo as linhas ao invés das colunas
+  byrow=T,
+  # Define o número de linhas da matriz
+  nrow=2
+  )
+
+# Cria a matriz e apresenta numa tabela
+matriz_var_cov |> 
+  knitr::kable()
+```
+
+##### Vamos, agora, fazer a simulação.
+
+```{r, message=FALSE, warning=FALSE}
+# Definindo semente
+set.seed(345)
+
+# Normal bivariada
+norm_bivariada <- MASS::mvrnorm(n = 10000, 
+                                # Primeiro parâmetro
+                                mu = vetor_media, 
+                                # Segundo parâmetro
+                                Sigma  = matriz_var_cov)
+
+# Transformando em uma tabela
+bivariada_tibble1 <- as_tibble(norm_bivariada,
+                               .name_repair = "universal") |> 
+  # Renomeando as colunas
+  rename(x = '...1', 
+         y = '...2')
+```
+
+##### Plotando a variável X em um gráfico de densidade
+
+```{r}
+# Plotando em um gráfico de densidade
+bivariada_tibble1 |> 
+  ggplot() +
+  aes(x) +
+  geom_density()
+```
+
+##### Plotando a variável Y
+
+```{r}
+# Plotando em um gráfico de densidade
+bivariada_tibble1 |> 
+  ggplot() +
+  aes(y) +
+  geom_density()
+
+```
+
+##### Visualizando X e Y em um gráfico 2D
+
+```{r}
+# Plotando em um gráfico de densidade 2D
+bivariada_tibble1 |> 
+  ggplot() +
+  aes(x, y) +
+  geom_density2d()
+```
+
+##### Visualizando X e Y em um gráfico de pontos
+
+```{r}
+# Plotando em um gráfico de pontos
+bivariada_tibble1 |> 
+  ggplot() +
+  aes(x, y) +
+  geom_point()
+```
+
+##### Fazendo o modelo regressão
+
+```{r}
+# Criando objeto que guarda o modelo
+reg1 <- lm(    # lm (linear model)
+  y ~x,        # Variáveis dependentes e independentes
+  data = bivariada_tibble1)
+
+summary(reg1) # Mais para frente do curso, vamos aprender a interpretar os resultados
+```
+
+##### Construindo outros modelos
+
+Em seguida, no livro, o autor cria outros modelos com valores diferentes para os parâmetros e plota as representações gráficas. Aqui, vou só reproduzir os modelos e apresentar a tabela comparando os resultados entre eles.
+
+###### Modelo 2
+
+```{r, message=FALSE, warning=FALSE}
+# vetor de médias
+vetor_media <- c(0,0)
+
+# cov menor, dp o mesmo
+sigma_x <- 2
+sigma_y <- 2
+
+rho <- .3
+
+# Criando a matriz (segundo parâmetro)
+matriz_var_cov <- matrix(c(sigma_x^2, rho*sigma_x*sigma_y, rho*sigma_x*sigma_y,  sigma_y^2 ), byrow=T, nrow=2)
+
+# Normal bivariada
+norm_bivariada <- MASS::mvrnorm(n = 10000, 
+                                # Primeiro parâmetro
+                                mu = vetor_media,
+                                # Segundo parâmetro
+                                Sigma  = matriz_var_cov)
+
+# Transformando em uma tabela
+bivariada_tibble2 <- as_tibble(norm_bivariada, .name_repair = "universal") %>%
+  # Renomeando as colunas
+  rename(x = '...1', 
+         y = '...2')
+
+# Criando o modelo 2
+reg2 <- lm( y ~x , data = bivariada_tibble2)
+```
+
+###### Modelo 3
+
+```{r, message=FALSE, warning=FALSE}
+# cov igual, dp de x maior
+sigma_x <- 4
+
+rho <- .3
+
+# Criando matriz
+matriz_var_cov <- matrix(
+  c(sigma_x^2, rho*sigma_x*sigma_y, rho*sigma_x*sigma_y,  sigma_y^2 ), 
+  byrow=T, 
+  nrow=2)
+
+# Normal Bivariada
+norm_bivariada <- MASS::mvrnorm(n = 10000, mu = vetor_media, Sigma  = matriz_var_cov)
+
+# Transformando em uma tabela
+bivariada_tibble3 <- as_tibble(norm_bivariada, .name_repair = "universal") %>%
+  rename(x = '...1', 
+         y = '...2')
+
+# Criando o modelo 3
+reg3 <- lm( y ~x , data = bivariada_tibble3)
+```
+
+###### Modelo 4
+
+```{r, message=FALSE, warning=FALSE}
+# cov maor, dp de x maior
+sigma_x <- 4
+sigma_y <- 2
+
+rho <- .15
+
+# Criando matriz
+matriz_var_cov <- matrix(
+  c(sigma_x^2, rho*sigma_x*sigma_y, rho*sigma_x*sigma_y,  sigma_y^2 ), 
+  byrow=T, 
+  nrow=2)
+
+# Normal bivariada
+norm_bivariada <- MASS::mvrnorm(n = 10000, mu = vetor_media, Sigma  = matriz_var_cov)
+
+# Transformando em uma tabela
+bivariada_tibble4 <- as_tibble(norm_bivariada, .name_repair = "universal") %>%
+  rename(x = '...1', 
+         y = '...2')
+
+# Criando o modelo 4
+reg4 <- lm( y ~x , data = bivariada_tibble4)
+```
+
+##### Tabela para comparação dos resultados
+
+```{r}
+#stargazer::stargazer(list(reg1, reg2, reg3, reg4),
+#                     title = "Regressão linear",
+#                     omit.stat = "f",
+#                     column.labels = c("cov = 2.4, s_x = 2", "cov = 1.2, s_x #= 2", "cov = 2.4, s_x = 4", "cov = 1.2, s_x = 4")
+#                     )
+```
+:::

@@ -1,0 +1,48 @@
+---
+title: "Aula 9 - Estimação por Máximo Verossimilhança"
+format: html
+editor: visual
+---
+
+### Estimação por Máximo Verossimilhança (Maximum Likelihood)
+
+-   Desvatagem do OLS: não conseguimos estimar a incerteza
+
+-   O método de máximo verossimilhança permite, mas esse método tem um custo: é necessário fazer uma suposição
+
+#### O que é Maximum Likelihood?
+
+-   Vamos supor que temos uma eleição com duas candidatas $A$ e $B$
+
+-   Queremos estimar a proporção de votos que cada candadita vai receber
+
+-   1 se vota na candidata $A$ e 0 caso contrário
+
+-    Cada observação $i$ é (chamada de "sucesso") com probabilidade $p$, e 0 (chamada de "fracasso") com probabilidade $1-p$
+
+-   A probabilidade de obter $x$ sucessos em $n$ observações é a probabilidade conjunta, dada por:
+
+$$
+\prod _{i=1}^{n} = p^{x}(1-p)^{n-x}
+$$
+
+-   OBS.: no texto fala que a fórmula deve ser, na verdade, $Pr(X=x) = \binom{n}{x} p^{x^(1-p)}{n-x}$
+
+-   Na verossimilhança, o $n$ e o $x$ são ficos e variamos o $p$ (em probabilidade, o $p$ é fixo)
+
+-   Além disso, na verossimilhança o resultado máximo por ser $>1$
+
+-   A ideia é escolher um estimador de $p$ que maximmize essa função para os dados observados ($n$ e $x$)
+
+#### Acrescentando uma suposição ao modelo de regressão
+
+1.  Os erros $e_{i} \sim N(0, \alpha ^{2})$ são independentes de $X$
+2.  Os erros são independentes entre observações
+
+-   Uma consequência dessas suposições é que a própria variável resposta $Y$ torna-se independente entre observações, condicional aos preditores
+
+### Conclusão
+
+-   Como fazemos uma suposição de que os erros são normais...
+
+-   Disso torna-se possível fazer teste de hipótese etc.

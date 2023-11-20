@@ -1,0 +1,276 @@
+---
+title: "Fichamento Expositivo - CEF (capítulo 6)"
+subtitle: "Livro: Galdino, Manoel. CEF (capítulo 6). In: _______. Introdução à Regressão para Ciências Sociais"
+format: html
+editor: visual
+---
+
+::: {style="text-align: justify"}
+## Capítulo 6 - Conditional Expectation Function
+
+Ao invés de expressar as notações como *E\[salário \| gênero\]*, vamos representar essas variáveis por letras. A variável dependente comumenete é chamada de Y e as variáveis preditoras de X. A esperança pode ser escrita com diversas variáveis preditoreas
+
+*E\[Y \| X~1~ = x~1~, X~2~ = x~2~, ..., X~k~ = x~k~\] = m(x~1~, x~2~)*
+
+"A CEF é uma função porque seu valor varia a depender dos valores particulares que X~1~, X\~2, ..., X~k~ assumem". A letra *m* do outro lado representa qual a média de Y quando X~1~, X\~2, ..., X~k~.
+
+É comum escrever somente:
+
+*E\[Y \| X~1~, X~2~, ..., X~k~\]*
+
+"Se tivermos apenas um único preditor, X, então a CEF é dada por:
+
+*E\[Y \| X\] = m(X)*
+
+## 6.1 Erro da CEF
+
+Notação:
+
+*e = Y - m(X)*
+
+Ou:
+
+*Y = m(X) + e*
+
+O erro *e* é uma variável aleatória.
+
+Propriedade: "o erro *e* tem esperança condicional X igual a zero". \[Por quê?\]
+
+## 6.2 Simulando para entender a CEF
+
+"Suponha que *Y = X\^2 + U*, em que *U \~ norm(0, 1)* e *X \~norm(0, 1)*".
+
+```{r}
+set.seed(234)
+
+n <- 1000
+x <- rnorm(n)
+u <- rnorm(n)
+y <- x^2 + u
+
+m1 <- mean(y)
+m2 <- median(y)
+
+erro1 <- y - m1
+erro2 <- y - m2
+
+print(sum(erro1^2))
+
+print(sum(erro2^2))
+```
+
+Veja que temos duas MSE calculadas, a primeira usando a média de *Y* e a outra e mediana. Como é possível percebr, a média teve um desempenho melhor.
+
+## 6.3 Propriedades da CEF
+
+A esperança do *erro* é:
+
+*E\[e\] = E\[Y - m(X)\]*
+
+e
+
+*E\[e \| X\] = E\[Y - m(X) \| X\]*
+
+"Pela propriedade de lineraridade da esperança, temos então:"
+
+E\[e \| X\] = E\[Y \| X\] - E\[m(X) \| X\]
+
+"Do que segue:"
+
+*E\[e \| X\] = m(X) - E\[m(X) \| X\]*
+
+### 6.3.1 A esperança do Erro Condicional a X é xero
+
+"Existe um teorema, que não irei demonstrar, chamando de teorema do condicionamento, que diz que em situações como *E\[m(X)\|X\]*, isso é igual a *m(X)*. O que torna essa equação igual a zero."
+
+*E\[e\|X\] = m(X) - m(X) = 0*
+
+### 6.3.2 A esperança (não-condicional) do erro é zero
+
+"E existe um outro teorema, chamado de lei das esperanças iteradas (Law of Iterated Expectations) que diz que a esperança da esperança condicional é a esperança não-condicional. Ou seja:"
+
+*E\[E\[ Y\|X \]\] = E\[Y\]*
+
+"Utilizando esse fato, temos que a esperança não-condicional do erro também é zero."
+
+*E\[e\] = E\[E\[e\|X\]\] = E\[0\] = 0*
+
+#### 6.3.2.1 Intruição da Law of Iterated Expectations (LIE)
+
+Vamos supor dois dados. O dado A tem 6 faces e o dado B tem 4 faces. Y será o valor que sai ao jogar um dado e X é tipo de dado que foi jogado (A ou B).
+
+"Queremos mostrar que:"
+
+*E\[E\[ Y\|X \]\] = E\[Y\]*
+
+"A média das médias condicionais é dado pela média quando escolho o dado A (vezes sua probabilidade) mais a média quando escolho o dado B (vezes sua probabilidade)".
+
+"Se eu escolher cada dado aleatoriamente, isto é, com probabilidade 50%, então o valor médio de *Y*, dado por E\[y\], é simplesmente:
+
+*E\[Y\|A\] = (1+2+3+4+5+6)/6 = 3.5*
+
+*E\[Y\|B\] = (1+2+3+4)/4 = 2.5*
+
+*3.5 x 0.5 + 2.5 x 0.5 = 3*
+
+### 6.3.3 O erro da CEF é não-correlacionado com X
+
+"Por fim, uma última propriedade que não iremos demonstrar é que o erro da CEF é não-correlacionado com qualquer função de *X*".
+
+...
+
+### 6.3.4 A esperança condicional é o melhor preditor
+
+Nesta seção, o autor prova porque a esperança condicional é o melhor preditor.
+
+## 6.4 Regressão Linear e a CEF
+
+"O modelo de regressão que iremos rodar com nossos dados pode ser conectado com a CEF em três maneiras diferentes (pelo menos)".
+
+### 6.4.1 Ordinary Least Squares (OLS)
+
+Ordinary Least Squares (OLS), ou Mínimos Quadrados Ordinários.
+
+Uma suposição do modelo de regressão linear é que "queremos achar a melhor reta que se ajusta aos nossos dados". "Se tivermos apenas um preditor, *X*, e uma variável a ser predita, *Y*, a equação da reta de regressão (populacional) é:"
+
+*Y = α + β x X + e*
+
+"Essa reta é chamada de reta de regressão populacional ou até função de regressão populacional."
+
+"Eu posso ter infinitas combinações de valores de α e β formando infinitas retas de regressões. Porém, só uma delas me dará a menor soma dos erros quadráticos."
+
+#### 6.4.1.1 Equação da Reta
+
+Interpretando a reta:
+
+-- α é o intercepto, isto é, o ponto onde a reta cruza o eixo y -- β é a inclinação ou coeficiente angular da reta
+
+```{r, warning=FALSE}
+library(ggplot2)
+
+set.seed(234)
+
+n <- 1000
+x <- rnorm(n)
+u <- rnorm(n)
+y <- 2 + 1.3*x + u
+
+df <- data.frame(y = y, x = x)
+
+df |> 
+  ggplot(aes(x, y)) +
+  geom_point() +
+  geom_smooth(se = FALSE, method = "lm") +
+  geom_abline(slope= .5, intercept = 1, colour="red") +
+  geom_abline(slope= 3, intercept = 3, colour="green", size=1) +
+  geom_abline(slope= 0, intercept = 2, colour="grey", size=1)
+```
+
+No gráfico, é possível visualizar que a reta azul é a melhor, pois se ajusta melhor aos dados.
+
+"Para achar os valores da reta azul (que aqui sabemos ser α = 2 e β = 1.3), podemos novamente minimizar a MSE. A derivação requer calcular a derivada ou utilização de álgebra linerar, requisitos matemáticos para além do curso."
+
+**Fórmula de β**
+
+*cov(Y, X) / var(X)*
+
+**Fórmula de α**
+
+*E\[(Y)\] - β x E\[X\]*
+
+**Nota:** As fórmulas completas estão no livro, nesta mesma seção. Não as escrevo aqui porque não sei como fazer inserir expressões matemáticas no Quarto.
+
+"Se nós aplicarmos essa fórmula para os dados do gráfico acima, iremos recuperar um valor aproximado da verdadeira reta de regressão"
+
+```{r, message=FALSE}
+library(tidyverse)
+
+df |> 
+  summarise(cov_yx = cov(y,x),
+            var_x = var(x),
+            beta = cov_yx/var_x,
+            alpha = mean(y) - beta*mean(x)) |> 
+  knitr::kable(digits=3)
+```
+
+```{r}
+lm(y ~x, df)
+```
+
+Nas próximas seções, o autor vai justitifacar "porque faz sentido ajustar uma reta de regressão para aproximar a CEF."
+
+**Observação**
+
+"Aproximar a CEF" significa estimar ou calcular uma função que seja uma aproximação da Função de Esperança Condicional (CEF) real. A CEF representa a relação entre uma variável dependente (ou de interesse) e variáveis independentes (ou condicionais) em um problema de modelagem estatística. No entanto, é frequentemente difícil ou impossível determinar a CEF real.
+
+Portanto, em vez de obter a CEF exata, a abordagem comum é "aproximá-la". Isso envolve escolher um modelo matemático ou estatístico que descreva a relação entre as variáveis de maneira simplificada e, em seguida, estimar os parâmetros desse modelo com base nos dados disponíveis.
+
+### 6.4.2 Suponha que a CEF é linear (justificativa I)
+
+"Se a CEF for de fato linear, então devemos usar a reta de regressão para estimar a CEF".
+
+Quando a CEF será linear?
+
+-- "Quando a distribuição conjunta de probabilidade de Y e X for normal (normal bivariada, no caso de duas variáveis, ou multivariada, no caso de muitas variáveis)"
+
+-- Modelo saturado: "em um modelo de regressão linear saturado, existe um parâmetro para cada possível valor que os preditores podem assumir".
+
+" Fora esses dois cenários, não temos muito motivo para supor que a CEF é linear".
+
+### 6.4.3 O modelo linear de regressão é o melhor preditor linear de Y (justificativa II)
+
+"Ou seja, se eu minimizar o erro entre o *Y* observado e minha previsão dada pelo modelo linear α + β ∗ x, em que α e β são definidos pelas fórmulas derivadas de OLS, terei o menor erro possível. Formalmente estou minimizando *E\[Y - m(x)\]*".
+
+### 6.4.4 A reta de regressão é a aproximação com a menor MSE (justificativa III)
+
+...
+
+## 6.5 Linearidade e Causalidade
+
+Quando estamos interessados em modelos causais uma pergunta que surge é: "sob que condições a CEF nos diz o efeito causas de *X* sobre *Y*?
+
+## 6.6 Modelo só com intercepto
+
+Esse tipo de modelo de regressão linear é o mais simples. Ele não tem nenhum preditor X. "Nesse caso, m(X) = E\[Y\] = μ, a média não condicional de Y".
+
+*Y = μ + e*
+
+Com *E\[e\] = 0*.
+
+## 6.7 Variância da Regressão
+
+"A variância não condicional do erro da CEF é dada por:"
+
+σ\^2 = var\[e\] = E\[(e-E\[e\])\^2\] = E\[e\^2\]
+
+"A variância da regressão mede a porção da variância que não é"explicada" ou predita pela esperança condicional, já que é definida pela variância do erro\
+*e*. Além disso, ela depende dos preditores. Se temos preditores diferentes, a varância da regressão será diferente."
+
+### 6.7.1 Chuva na Jamaica
+
+"Uma propriedade da variância da regressão é que adicionar preditores não piora a variância e quase sempre melhora (reduz). É uma relação não-monotônica, isto é, a variância com mais preditores é sempre menor ou igual que a variância com menos preditores (se a com mais preditores incluir os mesmos preditores da com menos regressores). Por isso que uma professor meu dizia: se você mediu chuva na Jamaica, pode colocar essa variável como preditora da regressão que isso irá reduzir a variância não explicada".
+
+## 6.8 Variância condicional
+
+"Sabemos que a esperança condicional é o melhor preditor que existe. Porém, ainda assim pode ser uma previsão ruim, como vimos no caso dos salários condicional ao gênero. Nesses casos, é útil olhar também para a variância condicional."
+
+*σ\^2(x) = var\[Y\|X = x\] = E\[(Y - E\[Y\|X = x\])\^2\] = E\[e\^2\|X = x\]*
+
+## 6.9 Efeito marginal
+
+"A regressão pode ser intepretada como efeito marginal."
+
+## 6.10 CEF linear com regressores não-lineares
+
+O modelo de regressão linear apresentado ao longo da discussão para aproximar a CEF é "linear nos parâmetros, mas pode ser não-linear nas variáveis".
+
+"Assim, a seguinte equação de regressão é linear nos parâmetros:"
+
+y = a + b \* x + c \* x\^2 + e
+
+"Porém, essa outra equação não é linear nos parâmetros:"
+
+y = a + b \* x + c \* x\^d + e
+
+"Vejam que o parâmetro *d* entra exponenciado e, portanto, não linearmente."
+:::

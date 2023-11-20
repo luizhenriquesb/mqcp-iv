@@ -1,0 +1,170 @@
+---
+title: "Métodos Quantitativos IV - Lista 1 (resolução)"
+author: 'Luiz Henrique da Silva Batista (Número USP: 12687228)'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercício 1
+```{r}
+# install.packages("devtools")
+# devtools::install_github("tbrugz/ribge")
+
+library(ribge)
+
+pop2020 <- populacao_municipios(2020)
+```
+
+### Qual a unidade de análise desse banco de dados?  
+**R:** São os municípios brasileiros.
+
+# Exercício 2
+
+```{r}
+pop2020_limpo <- pop2020 |> 
+  # removendo as variáveis codigo_uf e populacao_str
+  dplyr::select(-codigo_uf, -populacao_str) |> 
+  # renomeando a variável nome_munic para municipio
+  dplyr::rename(municipio = nome_munic) |> 
+  # colocando todos os nomes dos municípios em letras minúsculas
+  dplyr::mutate(municipio = tolower(municipio)) |> 
+  # selecionando apenas os municípios do estado de São Paulo
+  dplyr::filter(uf == "SP")
+```
+
+### Quantos municípios há no estado de São Paulo?  
+**R:** Existem 645 municípios no estado de São Paulo.
+
+```{r}
+pop2020_limpo |> 
+  dplyr::count(uf) |> 
+  knitr::kable()
+```
+
+### Qual é o menor município do estado? Quantos habitantes ele tem?
+**R:** Borá é o menor município, com apenas 838 habitantes.
+
+```{r}
+menor_municipio <- pop2020_limpo |> 
+  # resumindo o dataset em apenas duas colunas para facilitar a visualização
+  dplyr::select(municipio, populacao) |> 
+  # colocando os dados em ordem crescente pela população
+  dplyr::arrange(populacao)
+  
+# criando tabela com uma amostra de 10 municípios para facilitar a visualização
+knitr::kable(menor_municipio[1:10, ])
+```
+
+# Exercício 3
+
+Para a variável ”populacao”, calcule: (i) a média, (ii) a mediana, 
+(iii) o desvio padrão e (iv) a variância
+
+```{r}
+pop2020_limpo |> 
+  dplyr::summarise(media = mean(populacao, na.rm = TRUE),
+                   mediana = median(populacao, na.rm = TRUE),
+                   desvio_padrao = sd(populacao, na.rm = TRUE),
+                   variancia = var(populacao, na.rm = TRUE)) |> 
+  knitr::kable()
+```
+
+# Exercício 4
+
+```{r}
+library(ggplot2)  
+
+# Criando gráfico de densidade
+pop2020_limpo |> 
+  ggplot(
+    aes(x = populacao)
+  ) +
+  geom_histogram(bins = 30L, fill = "#4682B4", alpha = 0.5) +
+  labs(
+    x = "População",
+    y = "Frequência",
+    title = "Distribuição da população dos municípios do Estado de SP",
+    subtitle = "Em escala logarítmica"
+  ) +
+  theme_bw() +
+  # colocando em escala logarítmica 
+  scale_x_log10() +
+  theme(
+    plot.title = element_text(size = 11,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 10),
+    axis.title.x = element_text(size = 10)
+  )
+```
+
+### O que você observa?
+**R:** Trata-se de uma distribuição assimétrica à direita, devido à existência de muitos municípios com uma população total em torno de 10 mil habitantes e apenas um município com mais de 10 milhões de habitantes (São Paulo).  
+
+### Qual parece ser a medida mais adequada de tendência central: a média ou a mediana?
+**R:** Conforme a distribuição é altamente assimétrica, a mediana é a medida de tendência central mais adequada (uma vz que a média é bastante afetada por valores extremos).
+
+# Exercício 5
+
+```{r}
+pop2020_limpo |> 
+  # filtrando apenas os municípios com até 50 mil habitantes
+  dplyr::filter(populacao < 50000) |> 
+  ggplot(
+    aes(x = populacao)
+  ) +
+  geom_histogram(bins = 30L, fill = "#4682B4", alpha = 0.5) +
+  labs(
+    x = "População",
+    y = "Frequência",
+    title = "Distribuição da população dos municípios do Estado de SP",
+    subtitle = "Apenas municípios com até 50 mil habitantes"
+  ) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(size = 11,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 10),
+    axis.title.x = element_text(size = 10)
+  )
+```
+
+### Quantos municípios com menos de 50.000 há?  
+**R:** Existem 504 municípios com menos de 50 mil habitantes.
+
+```{r}
+pop2020_limpo |> 
+  # filtrando os muncípios com até 50 mil habitantes
+  dplyr::filter(populacao < 50000) |> 
+  dplyr::count(uf) |> 
+  knitr::kable()
+```
+
+### Em comparação ao gráfico anterior, o que você observa?  
+**R:** No gráfico anterior, a visualização estava díficil devido à existência de apenas um município com população total bastante discrepante dos demais (São Paulo, no caso, com mais de 12 milhões de habitantes). Colocamos os dados em escala logarítmica para facilitar a visualização e foi possível perceber que os dados apresentam uma distribuição assimétrica à direita. Ao filtrar apenas municípios com menos de 50 mil habitantes, novamente nos deparamos com uma distribuição assimétrica à direita.
+
+# Exercício 6
+
+```{r}
+# utilizando a base original
+pop2020 |>
+  dplyr::group_by(uf) |> 
+  # calculando a média populacional de cada estado por município
+  dplyr::summarise(pop_media_municipio = mean(populacao)) |> 
+  # colocando os dados em ordem crescente pela população média
+  dplyr::arrange(pop_media_municipio) |> 
+  knitr::kable()
+```
+
+# Exercício 7
+
+Este relatório foi feito a partir do RMarkdown.
+
+```{r, echo=FALSE, out.width='15%'}
+knitr::include_graphics("logo-rmarkdown.png")
