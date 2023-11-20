@@ -72,6 +72,7 @@ modelo1 <- lm(Renda ~ sexo_dummy, data = data)
 $$
 Renda = \alpha + \beta_{1} X_{sexo}
 $$
+
 -   Inteprete os coeficientes
 
 O $\alpha$ (alpha) representa o ponto em que a nossa reta de regressão corta o eixo $Y$. Já o $\beta$ (coeficiente angular da reta) fornece a inclinação da reta. Assim, podemos interpretá-lo como o quanto em média $Y$ deve aumentar ou diminuir para cada aumento de uma unidade em $X$.
@@ -95,9 +96,7 @@ Em nosso exemplo, a renda estimada das mulheres ($X = 0$) é igual a R\$ 1720.78
 
 Com base na questão anterior, qual é a renda média das mulheres? E a dos homens? Confirme que os resultados coincidem com o cálculo das médias para cada sexo utilizando a função "summarise".
 
-A renda média das mulheres é R\$ 1720.78 e a renda média dos homens é R\$ 2077.95 (R\$ 1720.78 + R\$ 357.17).
-
-Confirmando esses valores com a função `summarise`, temos:
+A renda média das mulheres é R\$ 1720.78 e a renda média dos homens é R\$ 2077.95 (R\$ 1720.78 + R\$ 357.17). Confirmando esses valores com a função `summarise`, temos:
 
 ```{r, message=FALSE}
 data |> 
@@ -124,9 +123,7 @@ $$Renda = \alpha + \beta_{1} X_{Horas\ trabalhadas}$$
 
 -   Inteprete os coeficientes
 
-Esse modelo retornará uma renda estimada para um total de 0 (zero) horas trabalhadas
-
-A renda estimada para um total de 0 (zero) horas trabalhadas é de R\$ 846.7765 e a nosso modelo estima cerca de R\$ 28.9 para cada hora a mais trabalhada.
+Esse modelo retornará uma renda estimada para um total de 0 (zero) horas trabalhadas (valor representado pelo nosso $\alpha$) e retornará, também, o quanto a renda deve aumentar (ou diminuir) para cada hora a mais trabalhada (valor representado pelo nosso $\beta$).
 
 -   Qual é a renda prevista para uma pessoa que trabalha 40 horas por semana? Considere que a variável dependente refere-se à renda mensal
 
@@ -153,16 +150,20 @@ A renda estimada para um total de 0 (zero) horas trabalhadas é de R\$ 846.7765 
 
 Calcule os intervalos de confiança para os coeficientes das duas regressões das questões anteriores ao nível de confiança de 95%.
 
+$$
+IC = coeficiente\ (+-)\ 2\ \cdot Std. Error
+$$
+
 **Modelo 1**: $Renda = \alpha + \beta_{1} X_{sexo}$
 
-|    Intervalo de confiança de 95% para $\alpha$     |     Intervalo de confiança de 95% para $\beta$     |
-|:--------------------------------------------------:|:--------------------------------------------------:|
-| (`r 1720.8 - 2 * 10.08`); (`r 1720.8 + 2 * 10.08`) | (`r 357.17 - 2 * 13.13`); (`r 357.17 + 2 * 13.13`) |
+|  Intervalo de confiança de 95% para $\alpha$   |   Intervalo de confiança de 95% para $\beta$   |
+|:----------------------------------:|:----------------------------------:|
+| `r 1720.8 - 2 * 10.08`; `r 1720.8 + 2 * 10.08` | `r 357.17 - 2 * 13.13`; `r 357.17 + 2 * 13.13` |
 
 **Modelo 2**: $Renda = \alpha + \beta_{1} X_{Horas\ trabalhadas}$
 
 |       Intervalo de confiança de 95% para $\alpha$        |      Intervalo de confiança de 95% para $\beta$      |
-|:--------------------------------------------------------:|:----------------------------------------------------:|
+|:-----------------------------------:|:---------------------------------:|
 | (`r 846.7765 - 2 * 18.1846`; `r 846.7765 + 2 * 18.1846`) | (`r 28.9009 - 2 * 0.4535`; `r 28.9009 + 2 * 0.4535`) |
 
 -   Explique o que representam os intervalos de confiança
@@ -175,12 +176,12 @@ Informam que existe uma probabilidade de 95% de que o parâmetro populacional es
 
 -   O que significa dizer que os coeficientes são estatisticamente significantes ou insignificantes?
 
-Significa dizer
+Ao dizer que os coeficientes são estatisticamente significante ou insignificante temos que ter em mente algum nível de confiança. Podemos, por exemplo, dizer que nossos coeficientes são estatisticamente significantes ao nível de 95%, o que significa dizer que temos 95% de confiança de que nosso parâmetro estimado é diferente de 0. O contrário poderia ser afirmado se nossss coeficientes não fossem estatisticamente significantes.
 
 ### Exercício 6
 
 Apresente seus resultados em um arquivo PDF. Garanta que seu arquivo esteja limpo, contendo as respostas, os gráficos e as tabelas, mas não eventuais mensagens e erros. O arquivo PDF pode ser gerado diretamente a partir do R por meio do RMarkdown ou do RSweave. Para os alunos de graduação, isso é recomendado, mas não obrigatório. Adicionalmente, forneça o script para replicação.
 
-```{r, echo=FALSE, out.width='15%'}
+```{r, echo=FALSE, out.width='15%', fig.align='center'}
 knitr::include_graphics("logo-rmarkdown.png")
 ```

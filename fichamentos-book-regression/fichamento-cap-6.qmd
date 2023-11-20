@@ -95,7 +95,7 @@ E\[e \| X\] = E\[Y \| X\] - E\[m(X) \| X\]
 
 *E\[e\] = E\[E\[e\|X\]\] = E\[0\] = 0*
 
-#### 6.3.2.1 Intruição da Law of Iterated Expectations (LIE)
+#### 6.3.2.1 Intuição da Law of Iterated Expectations (LIE)
 
 Vamos supor dois dados. O dado A tem 6 faces e o dado B tem 4 faces. Y será o valor que sai ao jogar um dado e X é tipo de dado que foi jogado (A ou B).
 
