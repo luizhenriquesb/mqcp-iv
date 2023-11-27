@@ -23,6 +23,8 @@ Essa a lista compreende questões sobre a verificação dos pressupostos do mode
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
+library(janitor)
+library(tidymodels)
 ```
 
 ### Exercício 1
@@ -60,36 +62,48 @@ O código abaixo está inteiramente comentado para que o processo de download do
 # unzip(zipfile = caminho, exdir = diretorio_destino)
 ```
 
-Limpe os dados para a análise
+Limpe os dados para a análise.
 
-```{r}
-enem_2022 <- data.table::fread(input="datasets/microdados_enem_2022/DADOS/MICRODADOS_ENEM_2022.csv",
-                               integer64='character',
-                               skip=0,  #Ler do inicio
-                               nrow=-1, #Ler todos os registros
-                               na.strings = "", 
-                               showProgress = TRUE) |> 
+```{r, message=FALSE}
+enem_2022 <- vroom::vroom("datasets/microdados_enem_2022/DADOS/MICRODADOS_ENEM_2022.csv",
+                          quote = "", delim = ";") |> 
   # Coloca em letras minúsculas os nomes das colunas 
   janitor::clean_names() |> 
   # Seleciona somente as variáveis de interesse
-  select(nu_nota_ch, nu_nota_mt)
+  dplyr::select(nu_nota_ch, nu_nota_mt)
 ```
+
+Para a leitura do arquivo, utilizamos a função `r vroom()` do pacote `r {vroom}`, que tem velocidade de leitura de cerca de 1,23 GB/s. Para mais informações sobre este pacote, acesse [este link](https://vroom.r-lib.org/).
 
 ### Exercício 2
 
 Utilize a nota do ENEM em ciências humanas para prever a nota em matemática por meio de uma regressão linear simples. Interprete os resultados.
 
 ```{r}
-reg <- lm(nu_nota_ch ~ nu_nota_mt, data = enem_2022)
+# reg <- lm(nu_nota_ch ~ nu_nota_mt, data = enem_2022)
+# 
+# reg |> 
+#   stargazer::stargazer(type = "latex",
+#                        title="Modelo",
+#                        single.row = T, 
+#                        keep.stat = c("n"),
+#                        dep.var.labels="Nota em matemática",
+#                        header=F,
+#                        dep.var.caption="")
+
+reg <- linear_reg() |>
+  set_engine("lm") |>
+  set_mode("regression") |>
+  fit(nu_nota_ch ~ nu_nota_mt, data = enem_2022)
 
 reg |> 
-  stargazer::stargazer(type = "latex",
-                       title="Modelo",
-                       single.row = T, 
-                       keep.stat = c("n"),
-                       dep.var.labels="Nota em matemática",
-                       header=F,
-                       dep.var.caption="")
+   stargazer::stargazer(type = "latex",
+                        title="Modelo",
+                        single.row = T, 
+                        keep.stat = c("n"),
+                        dep.var.labels="Nota em matemática",
+                        header=F,
+                        dep.var.caption="")
 ```
 
 ### Exercício 3
