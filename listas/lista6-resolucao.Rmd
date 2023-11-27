@@ -1,0 +1,129 @@
+---
+title: "Métodos Quantitativos IV - Lista 6 (resolução)"
+subtitle: "Departamento de Ciência Política da FFLCH-USP"
+author: 'Luiz Henrique da Silva Batista (Número USP: 12687228)'
+date: "2023-11-16"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Essa a lista compreende questões sobre a verificação dos pressupostos do modelo de regressão linear.
+
+```{r}
+# Material de apoio para esta lista:
+# https://jonnyphillips.github.io/Analise_de_Dados_2022/
+```
+
+### Carregando pacotes
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+### Exercício 1
+
+Nesta lista, utilizaremos os microdados do ENEM relativos a 2022. Faça o download dos dados do ENEM de 2022 e do dicionário de dados. Leia o dicionário de dados.
+
+```{r}
+# Link: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/enem
+# Selecione as variáveis NU_NOTA_CH e NU_NOTA_MT
+```
+
+Vamos fazer o download dos dados via URL. No código abaixo, elaborado em conjunto com o Chat GPT, baixamos o arquivo .zip diretamente da internet e, em seguida, extraímos os arquivos. Para visualizar o chat com a inteligência artificial basta clicar [neste link](https://chat.openai.com/share/43deb484-7fac-4c2f-ae97-c5a7080570bb).
+
+O código abaixo está inteiramente comentado para que o processo de download do arquivo .zip e a extração dos arquivos não se repita toda vez que gerarmos um PDF R Markdown.
+
+```{r}
+# # URL do arquivo zip que você quer baixar
+# url <- "https://download.inep.gov.br/microdados/microdados_enem_2022.zip"
+# 
+# # Diretório onde deseja salvar o arquivo zip
+######## EXCLUIR caminho <- "listas/dados/microdados_enem_2022.zip"
+# caminho <- "datasets/microdados_enem_2022.zip"
+# 
+# # Aumenta o tempo limite para 600 segundos (pois o download se encerra após 60 seg)
+# options(timeout = 600)
+# 
+# # Baixa o arquivo zip da URL e salva no caminho especificado
+# download.file(url, caminho, mode = "wb")
+# 
+# # Diretório para extrair os arquivos
+####### EXCLUIR diretorio_destino <- "listas/dados/microdados_enem_2022"
+# diretorio_destino <- "datasets/microdados_enem_2022"
+# 
+# # Extrair arquivos
+# unzip(zipfile = caminho, exdir = diretorio_destino)
+```
+
+Limpe os dados para a análise
+
+```{r}
+enem_2022 <- data.table::fread(input="datasets/microdados_enem_2022/DADOS/MICRODADOS_ENEM_2022.csv",
+                               integer64='character',
+                               skip=0,  #Ler do inicio
+                               nrow=-1, #Ler todos os registros
+                               na.strings = "", 
+                               showProgress = TRUE) |> 
+  # Coloca em letras minúsculas os nomes das colunas 
+  janitor::clean_names() |> 
+  # Seleciona somente as variáveis de interesse
+  select(nu_nota_ch, nu_nota_mt)
+```
+
+### Exercício 2
+
+Utilize a nota do ENEM em ciências humanas para prever a nota em matemática por meio de uma regressão linear simples. Interprete os resultados.
+
+```{r}
+reg <- lm(nu_nota_ch ~ nu_nota_mt, data = enem_2022)
+
+reg |> 
+  stargazer::stargazer(type = "latex",
+                       title="Modelo",
+                       single.row = T, 
+                       keep.stat = c("n"),
+                       dep.var.labels="Nota em matemática",
+                       header=F,
+                       dep.var.caption="")
+```
+
+### Exercício 3
+
+Calcule os intervalos de confiança dos coeficientes.
+
+**Modelo**: $Nota\ em\ matemática= \alpha + \beta_{1} X_{Nota\ em\ ciências\ humanas}$
+
+|         Intervalo de confiança de 95% para $\alpha$         |        Intervalo de confiança de 95% para $\beta$         |
+|:-----------------------------------:|:---------------------------------:|
+| `r alpha - 2 * std.error`; ``` r``alpha + 2 * std.error ``` | `r beta - 2 * std.error`; ``` r``beta + 2 * std.error ``` |
+
+Por que o R utiliza a distribuição t (e não a distribuição normal) para as inferências?
+
+### Exercício 4
+
+Utilize os resíduos para testar graficamente o seguinte: $E[\hat{e}|X=x]$. Explique a sua conclusão.
+
+Qual é a motivação desse teste? Em outras palavras, qual pressuposto do modelo linear gostaríamos de satistazer?
+
+Qual é a consequência da violação desse pressuposto?
+
+### Exercício 5
+
+Com base nos resíduos, utilize um gráfico para testar a hipótese de homocedasticidade dos erros. Explique a sua conclusão.
+
+Qual é a consequência da violação desse pressuposto?
+
+### Exercício 6
+
+Com base nos resíduos, utilize um gráfico para testar a hipótese de normalidade dos erros. Explique a sua conclusão.
+
+Qual é a consequência da violação desse pressuposto?
+
+### Exercício 7
+
+Apresente seus resultados em um arquivo PDF. Garanta que seu arquivo esteja limpo, contendo as respostas, os gráficos e as tabelas, mas não eventuais mensagens e erros. O arquivo PDF pode ser gerado diretamente a partir do R por meio do RMarkdown ou do RSweave. Para os alunos de graduação, isso é recomendado, mas não obrigatório. Adicionalmente, undefined

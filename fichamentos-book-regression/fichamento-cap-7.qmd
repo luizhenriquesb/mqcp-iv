@@ -15,26 +15,26 @@ library(knitr)
 library(MASS)
 ```
 
-**Nota:** Este capítulo tem muitas fórmulas, mas não sei como reproduzi-las aqui no no Quarto.
-
 O preditor linear ótimo com um único regressor possui:
 
--- Intercepto α = E\[Y\] - β \* E\[X\]\
--- Inclinação β = cov(Y, X) / var(X)
+-- Intercepto $\alpha = E[Y] - \beta * E[X]$\
+-- Inclinação $\beta = cov(Y, X) / var(X)$
 
 **O que isso significa?**
 
-Se "considerarmos o modelo de regressão $y~i~ = α + β * x~i~ + e~i~$ e usarmos essas fórmulas para calcular os valores de α e β em uma população, obteríamos uma reta ajustada que é o melhor preditor linear".
+Se "considerarmos o modelo de regressão $y_i = \alpha + \alpha * x_i + e_i$ e usarmos essas fórmulas para calcular os valores de $\alpha$ e $\beta$ em uma população, obteríamos uma reta ajustada que é o melhor preditor linear".
 
-Conforme lidamos com uma amostra *como se fosse* uma popualção, para facilitar as demonstrações, foi deixado de lado como funciona "a estimação de uma regressão a partir de uma amostra". Mas isso será visto agora.
+Conforme lidamos com uma amostra *como se fosse* uma população, para facilitar as demonstrações, foi deixado de lado como funciona "a estimação de uma regressão a partir de uma amostra". Mas isso será visto agora.
 
 ## 7.1 Plug-in estimators
 
-"Se tivermos uma amostra, e não a população, é razoável pensar que uma boa estimativa para os valores populacionais de α e β são justamente essas fórmulas, calculadas para os dados amostrais".
+"Se tivermos uma amostra, e não a população, é razoável pensar que uma boa estimativa para os valores populacionais de $\alpha$ e $\beta$ são justamente essas fórmulas, calculadas para os dados amostrais".
 
-**Plug-in estimates** é o nome dado ao estimador dos parÂmetros populacionais.
+**Plug-in estimates** é o nome dado ao estimador dos parâmetros populacionais.
 
-É comum usar as letras gragas com "chapéu" para representar estimativas amostrais de valores populacionais ou letras latinhas \$ b \$.
+É comum usar as letras gregas com "chapéu" para representar estimativas amostrais de valores populacionais ou letras latinas $b$.
+
+Ou seja,
 
 ## 7.2 Simulação de uma Normal Bivariada
 

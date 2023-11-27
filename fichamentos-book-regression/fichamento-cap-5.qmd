@@ -8,7 +8,9 @@ editor: visual
 ::: {style="text-align: justify"}
 ## 5.1 Modelo de Regressão - Teoria
 
-No livro, o autor considera que "a regressão linear é uma forma de aproximar a CEF (Conditional Expectation Function)".
+"O modelo de regressão é uma forma bem ampla de modelar os dados para prever uma variável de interesse". Exemplo: se desejamos "prever os voto de candidatas em uma eleição, a votação de cada candidata é minha variável de interesse $Y$."
+
+**Regressão linear:** trata-se de "uma forma de aproximar a CEF (Conditional Expectation Function)".
 
 ## 5.2 Esperança Condicional
 
@@ -24,9 +26,9 @@ O curso pretende apresentar modelos de previsão e modelos de causa dos efeitos.
 
 ## 5.3 Conditional Expectation Function (CEF)
 
-Uma boa previsão pode ser medida a partir da noção de Mean Squared Error (MSE). Quando menor o MSE, melhor a previsão. Nesse sentido, a CEF é o melhor preditor.
+Uma boa previsão pode ser medida a partir da noção de **Mean Squared Error (MSE)**. A ideia é que quanto menor o MSE, melhor a previsão. Nesse sentido, a **Conditional Expectation Function (CEF)** é o melhor preditor (melhor porque minimiza o MSE).
 
-A dificuldade associada ao uso da CEF é que "nunca sabemos qual a verdadeira função de esperança condicional \[CEF\]". O caminho a ser tomado é tentar "função de esperança condicional".
+A dificuldade associada ao uso da CEF é que "nunca sabemos qual a verdadeira função de esperança condicional \[CEF\]". O caminho a ser tomado é tentar "aproximar o mlehor possível a CEF, a partir de simplificações da realidade".
 
 **Dúvida:** Quais as razões para essas dificuldades?
 
@@ -38,7 +40,7 @@ A dificuldade associada ao uso da CEF é que "nunca sabemos qual a verdadeira fu
 
 Para esta seção, serão usados da PNAD Contínua. Para simplificar a exemplificação, será pressuposto que temos uma amostra aleatória dos salários
 
-### Importando a base da PNAD Contínua
+#### Importando a base da PNAD Contínua
 
 ```{r, message=FALSE}
 # Pacotes utilizados
@@ -66,7 +68,7 @@ df <- df |>
          raca = V2010)
 ```
 
-### Visualização gráfica da distribuição dos salários
+#### Visualização gráfica da distribuição dos salários
 
 Abaixo, temos um gráfico dos salários por horas trabalhadas.
 
@@ -87,15 +89,19 @@ data |>
 
 ## 5.6 Distribuição Condicional dos salários
 
-Podemos pensar que os salários se distribuem desigualmente entre determinados grupos, como entre homens e mulheres. Uma maneira de expressar isso em termos condicionais é:
+Podemos pensar que os salários se distribuem desigualmente entre determinados grupos, como entre homens e mulheres. Uma maneira de expressar isso em termos condicionais é;
 
-E\[salário \| gênero = Mulher\]
+$$
+E[salário|gênero - mulher]
+$$
 
-E\[salário \| gênero = Homenm\]
+$$
+E[salário|gênero = Homem
+$$
 
 **Nota:** A base de dados utilizada não é importada nesse capítulo. Além disso, é usada a variável V1028, que não sei o que é (e foi usada no argumento `aes(weight = V1028))`. Também seria importante perguntar sobre como acessar o dicionário.
 
-### Visualização gráfica da distribuição dos salários por gênero
+#### Visualização gráfica da distribuição dos salários por gênero
 
 Abaixo, temos um gráfico dos salários por hora trabalhada.
 
@@ -160,7 +166,9 @@ data |>
 
 Podemos expressar o output da tabela acima em termos de esperança condicional:
 
-E\[salário \| gênero, raça\]
+$$
+E[salário|gênero, raça]
+$$
 
 ## 5.9 Prevendo a partir da esperança condicional
 
@@ -183,7 +191,7 @@ data |>
   )
 ```
 
-### Calculando a MSE
+#### Calculando a MSE
 
 **Definição:** A MSE é definida "como a soma dos erros ao quadrado (para não cancelar)".
 
@@ -208,5 +216,5 @@ mse |>
   knitr::kable()
 ```
 
-A MSE diminui ao condiconar em mais variáveis.
+A MSE diminui ao condicionar em mais variáveis.
 :::
