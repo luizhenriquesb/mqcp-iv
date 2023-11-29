@@ -28,7 +28,7 @@ $$
 
 -   OBS.: no texto fala que a fórmula deve ser, na verdade, $Pr(X=x) = \binom{n}{x} p^{x^(1-p)}{n-x}$
 
--   Na verossimilhança, o $n$ e o $x$ são ficos e variamos o $p$ (em probabilidade, o $p$ é fixo)
+-   Na verossimilhança, o $n$ e o $x$ são fixos e variamos o $p$ (em probabilidade, o $p$ é fixo)
 
 -   Além disso, na verossimilhança o resultado máximo por ser $>1$
 

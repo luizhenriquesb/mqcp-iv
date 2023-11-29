@@ -1,0 +1,10 @@
+---
+title: "Fichamento Expositivo - Causalidade (capítulo 8)"
+subtitle: "Livro: Galdino, Manoel. Causalidade (capítulo 8). In: _______. Introdução à Regressão para Ciências Sociais"
+format: html
+editor: visual
+---
+
+::: {style="text-align: justify"}
+## Capítulo 8 - Causalidade
+:::

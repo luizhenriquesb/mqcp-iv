@@ -1,0 +1,158 @@
+---
+title: "Fichamento Expositivo - Maximum Likelihood (capítulo 9)"
+subtitle: "Livro: Galdino, Manoel. Maximum Likelihood (capítulo 9). In: _______. Introdução à Regressão para Ciências Sociais"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+::: {style="text-align: justify"}
+## 9.1 - Estimação de Maximum Likelihood
+
+O método de Mínimos Quadrados Ordinários (OLS) é usado para estimar os parâmetros de um modelo de regressão linear, mas por si só, não fornece diretamente estimativas da incerteza associada a esses parâmetros. Isso significa que podemos obter os valores dos coeficientes, mas não teremos uma medida clara da precisão ou da confiabilidade desses valores.
+
+Além do **método de OLS**, os coeficientes podem ser estimados também pelo **método de Maximum Likelihood (Máximo Verossimilhança)**. O conceito central envolve encontrar os valores dos parâmetros que maximizam a verossimilhança dos dados observados. Isso significa encontrar os valores dos parâmetros que tornam os dados observados mais prováveis, ou seja, que maximizam a chance de observar os dados que realmente foram observados.
+
+#### Exemplo: Proporção de votos
+
+Vamos supor que temos uma eleição com duas candidatas $A$ e $B$. Queremos estimar a proporção de votos que cada candidata vai receber.
+
+Vamos considerar 1 para votos na candidata $A$ e 0 caso contrário. Assim, cada observação $i$ é (chamada de "sucesso") com probabilidade $p$, e 0 (chamada de "fracasso") com probabilidade $1-p$. Desse modo, estamos modelando os dados como repetições de uma distribuição de Bernoulli. O parâmetro que queremos estimar é a proporção de votos para essa candidata na população
+
+A probabilidade de obter $x$ sucessos em $n$ observações é a probabilidade conjunta, dada por:
+
+$$Pr(X=x) = \binom{n}{x} p^{x^(1-p)}{n-x}$$
+
+A ideia da Máxima Verossimilhança é encontrar o valor do parâmetro ($p$, neste caso) que maximiza essa função de verossimilhança para os dados observados $n$ e $x$. Em outras palavras, queremos encontrar o $p$ que torna mais provável (ou mais verossímil) observar $x$ sucessos em $n$ tentativas.
+
+É possível mostrar que a função é máxima quando $p = x/n$. Ou seja, a verossimilhança é maximizada. Esse é o estimador de máxima verossimilhaça para uma proporção de uma distribuição binomial.
+
+#### Voltando para a regressão
+
+Para uma regressão, é algo similar. Eu vou supor uma distribuição de probabilidade para os dados $y$ (Normal, por exemplo) e, dada uma amostra, derivo um estimador para os parÂmetros $\alpha$ e $\beta$. Em relação ao estimador de MQO, na prática estamos acrescentando uma suposição ao nosso modelo de regressão:
+
+1.  Os erros $e_i \sim N(0, \sigma^2)$ e são independentes de $X$.
+2.  Os erros são independentes entre observações.
+
+Qual a relação com a máxima verossimilhança?
+
+A suposição feita sobre os erros $e_i$ em relação à distribuição normal ($e_i \sim N(0, \sigma^2)$) é uma forma de introduzir um tipo específico de estrutura para a variabilidade dos dados não explicada pelo modelo. Isso cria uma função de verossimilhança, que é usada para encontrar os melhores valores para $\alpha$ e $\beta$.
+
+A relação com a Máxima Verossimilhança surge quando consideramos que, ao assumir uma distribuição normal para os erros, estamos basicamente dizendo que, sob essas condições, a estimativa dos parâmetros ($\alpha$ e $\beta$) que melhor explicam os dados é aquela que maximiza a probabilidade de observar os valores reais de $y$ dadas as previsões do modelo ($\hat{y}$) e a distribuição normal dos erros $e$.
+
+Como não sabemos os valores reais de $y$, não vamos maximizar diretamente a probabilidade de encontrar valores específicos de $y$, mas sim a função de verossimilhança, que representa a probabilidade de observar os dados que já temos (os valores observados de $y$) sob um determinado modelo estatístico.
+
+Na MV, consideramos a verossimilhança dos dados observados em relação aos parâmetros do modelo.
+
+#### OLS e MV
+
+**Importante:** Com a suposição de normalidade dos erros, é possível mostrar que os estimadores de Máxima Verossimilhança são iguais aos de MQO. Isso significa que, sob a suposição de normalidade dos erros, os estimadores obtidos pela Máxima Verossimilhança e os estimadores obtidos pelos Mínimos Quadrados Ordinários são equivalentes na regressão linear.
+
+#### Por que isso acontece?
+
+Tem a ver com maximar a função de verossimilhança, mas não entendi.
+
+#### Parênteses: qual a diferença entre *resíduo* e *erro*?
+
+-   **Erros:**
+
+São as discrepâncias entre os valores reais observados e os valores previstos pelo modelo teórico ou pela população. Em um contexto ideal, os erros são desconhecidos, pois representam a diferença entre o valor real e o valor que o modelo deveria prever.
+
+-   **Resíduos:**
+
+São as discrepâncias entre os valores reais observados e os valores previstos pelo modelo estimado com base nos dados amostrais. Em um modelo estatístico, os resíduos são calculados como a diferença entre os valores observados e os valores preditos pelo modelo.
+
+## 9.2 Teste de hipótese
+
+O teste de hipotese tipicamente realizado em modelos de regressão consiste em testar a hipótese nula de que $\beta_1=0$. Sob a suposição de que isso é verdade, $\hat{\beta_1} \sim N(0, \frac{\sigma^2}{n \cdot s_x})$. E se quisermos cometer o erro de rejeitar a hipótese nula (isto é, rejeitar que $\beta_1 = 0$) no máximo 5% das vezes, se eu colhesse novas amostras repetidas vezes, então posso calcular se rejeito ou não minha hipótese nula ao nível de 5% de confiança.
+
+## 9.3 Exemplo com regressão
+
+Vamos Rodar uma regressão para verificar o efeito da idade sobre o voto utilizando uma base de dados de um survey feito no Reino Unido antes do Brexit.
+
+```{r, message=FALSE, warning=FALSE, results='asis'}
+library(tidyverse)
+library(data.table)
+
+# 1. Acessar <https://simonweschle.github.io/psc400.html>
+# 2. baixar o .csv da week 3
+
+# Importando a base de dados
+
+# usando read_delim()
+df <- read_delim("datasets/BES.csv")
+
+# Usando a função fread()
+bes <- fread("datasets/BES.csv")
+
+# Criando modelo
+reg <- lm(leave ~ age, data = bes)
+
+# Resumindo nossos resultados
+stargazer::stargazer(reg, 
+                     type =  "html", 
+                     style = "ajps",
+                     title = "Regressão linear - Brexit", 
+                     omit.stat = "f")
+```
+
+##### Interpretação
+
+###### 1. Intercept (alpha $\alpha$
+
+-   Valor que espero de Y quando o preditor é 0
+-   Não faz sentido que tenhamos pessoas com 0 anos de idade. Nem sempre interpretar o alpha fará sentido
+
+###### 2. Variável (beta $\beta$)
+
+$$Y = \alpha + \beta \cdot X_{idade}$$
+
+O resultado diz qual a porcentagem esperada de votos favoráveis ao brexit para a idade que passamos.
+
+Exemplo: porcentagem de votos favoráveis entre as pessoas que estão 80 anos de idade.
+
+```{r}
+idade = 80
+
+0.1194782 + 0.0072082 * idade # 69%
+```
+
+##### Teste de hipótese
+
+O p-valor é a probabilidade de eu observar dados tão ou mais extremos do que o observado, sob a suposição de que a hipótese nula é verdadeira. O erro padrão é 0.0002, ou seja, supondo normalidade (MLE), o p-valor é aproximadamente zero:
+
+```{r}
+
+# coef(reg)[2]: Retorna o segundo coeficiente, que é a variável independente
+
+# summary(reg)$coefficients[2, 2]: Acessa a tabela de resumo do modelo e extrai o erro padrão correspondente ao segundo coeficiente estimado
+
+# A divisão entre o coeficiente estimado pelo seu padrão retorna o valor z
+
+z <- coef(reg)[2]/summary(reg)$coefficients[2 , 2]
+
+print(z)
+```
+
+Calculando o p-valor (não entendi)
+
+```{r}
+p_valor <- 1 - pnorm(z)
+
+print(p_valor)
+```
+
+A função pnorm em R retorna a probabilidade acumulada de uma distribuição normal padrão até um determinado ponto. No entanto, para um teste de duas caudas (considerando extremos em ambos os lados da distribuição), é comum calcular o p-valor como duas vezes a área da cauda da distribuição normal padrão além do valor absoluto do z-score. Isso porque estamos interessados em saber se o valor observado é extremo tanto no lado positivo quanto no negativo da distribuição.
+
+```{r}
+p_valor <- 2 * (1 - pnorm(abs(z)))
+print(p_valor)
+```
+
+##### Intervalo de confiança
+
+O IC com 95% de confiança pode ser calculado da seguinte forma: (coef. + 2 \* std. error; coef. - 2 \* std. error).
+:::

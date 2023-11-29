@@ -1,0 +1,182 @@
+---
+title: "Fichamento Expositivo - Checagem (capítulo 10)"
+subtitle: "Livro: Galdino, Manoel. Causalidade (capítulo 10). In: _______. Introdução à Regressão para Ciências Sociais"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+::: {style="text-align: justify"}
+### Carregando pacotes
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(electionsBR)
+library(here)
+```
+
+## 10. Checagem
+
+Antes de proceder com a parte de inferência estatística, vamos apresentar como realizar checagem do modelo. A razão é que, em geral, a teoria de inferência depende da suposição do modelo ser correta.
+
+### 10.1 Resíduos
+
+Os resíduo para cada observação $i$ é a diferença entre a previsão do modelo de regressão $\hat{y_i}$ e o valor observado $y_i$, às vezes chamado de $\hat{e}$, para diferenciar do erro populacional, $e$. No caso de nosso modelo de regressão linear com um único preditor, temos:
+
+$$
+\hat{e_i} = y_i - (\hat{\alpha} + \hat{\beta} \cdot x_i)
+$$ Propriedades dos resíduos:
+
+1.  Os resíduos deveriam ter esperança zero, condicional aos preditores. Formalmente, $\mathbb{E}[\hat{e}|X=x] = 0$
+
+Isso sugere que o modelo está capturando adequadamente a tendência média dos dados. Para verificar essa propriedade, você pode plotar os resíduos em relação aos valores previstos. Se não houver um padrão discernível nos gráficos dos resíduos, isso indica que o modelo está capturando bem a tendência média.
+
+2.  Se estivermos supondo homocedasticidade, devem ter variância constante (o que raramente será o caso)
+
+A homocedasticidade indica que a variância dos resíduos é constante em todos os níveis dos preditores. Um gráfico dos resíduos em relação aos valores previstos pode ajudar a verificar se a dispersão dos resíduos é constante à medida que os valores previstos mudam. Padrões em forma de cone ou funil nos gráficos dos resíduos sugerem heterocedasticidade, indicando que a variância não é constante.
+
+3.  Por se tratar de uma amostra, a probabilidade dos resíduos serem completamente não-correlacionados entre si é zero, contudo a correlação deve ser baixa e convergir para zero à medida que $n$ cresce para infinito
+
+A independência dos resíduos entre si é desejável. Apesar de ser improvável que os resíduos sejam completamente não-correlacionados em uma amostra finita, a baixa correlação entre eles é importante. Você pode usar gráficos de autocorrelação dos resíduos ou testes estatísticos para verificar a independência dos resíduos.
+
+4.  Se estamos supondo que o erro é Gaussiano (Normal), como no modelo de MLE, os resíduos devem também ser normais
+
+Embora o pressuposto de normalidade não seja obrigatório para a validade do modelo, resíduos aproximadamente normais indicam que o modelo está capturando adequadamente a estrutura dos dados. Histogramas ou gráficos de densidade dos resíduos podem ajudar a avaliar essa propriedade. Testes de normalidade, como o teste de Shapiro-Wilk, também podem ser aplicados.
+
+Cada uma dessas propriedades nos leva a um diagnóstico ou checagem.
+
+## 10.2 Modelo no R
+
+Para fazer os testes do nosso modelo, vamos fazer um modelo preditivo.
+
+Vamos utilizar a votação no primeiro turno presidencial de 2018 para prever o voto no segundo turno, no estado de Alagoas.
+
+Para tanto, vamos baixar os dados de votação presidencial de 2018 ao nível de seção eleitoral do [portal de dados abertos do TSE](https://dadosabertos.tse.jus.br/dataset/resultados-2018).
+
+Podemos baixar o arquivo clicando no [link](https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2018_BR.zip) do dataset. Vamos deszipar e depois filtrar os dados para o estado de Alagoas (para ter uma base de dados pequena).
+
+##### Importando a base diretamente do TSE através da URL
+
+```{r}
+# URL do arquivo ZIP que você quer baixar
+url <- "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2018_BR.zip"
+
+# Caminho para a pasta onde você quer salvar o arquivo
+caminho_destino <- "datasets/dados_tse_2018"
+
+# Nome do arquivo ZIP que será baixado
+arquivo_destino <- paste(caminho_destino, "/dados_tse_2018.zip", sep = "")
+
+# Aumentando o tempo limite
+options(timeout = 300)
+
+# Baixando o arquivo ZIP
+download.file(url, destfile = arquivo_destino, mode = "wb")
+
+# Descompactando o arquivo ZIP
+unzip(arquivo_destino, exdir = caminho_destino)
+
+# Excluindo o arquivo ZIP após descompactar
+file.remove(arquivo_destino)
+```
+
+##### Investigando a nossa base
+
+```{r}
+presid_al18 <- vroom::vroom("datasets/dados_tse_2018/votacao_secao_2018_BR.csv",
+                          delim = ";", 
+                          locale = locale(encoding = "Latin1")
+                          )
+# filtrando só AL
+presid_al18 <- presid_al18 |>
+  filter(SG_UF == "AL")
+
+# descobre o que é voto nulo e branco
+presid_al18 |>
+  group_by(NM_VOTAVEL) |>
+  summarise(max(NR_VOTAVEL))
+```
+
+```{r}
+presid_al18_valido <- presid_al18 |>
+  # Exclui brancos e nulos
+  filter(!NR_VOTAVEL %in% c(95,96)) |>
+  group_by(NR_SECAO,NR_ZONA, CD_MUNICIPIO, NR_TURNO, NR_VOTAVEL ) |>
+  summarise(validos = sum(QT_VOTOS)) |>
+  mutate(bol_bolsonaro = NR_VOTAVEL == 17,
+         validos_bolsonaro = sum(validos*bol_bolsonaro)) |>
+  summarise(total_validos = sum(validos),
+            validos_bolsonaro = max(validos_bolsonaro),
+            perc_bolsonaro = validos_bolsonaro/total_validos) |>
+  dplyr::select(-total_validos) |>
+  pivot_wider(id_cols = c(NR_SECAO, NR_ZONA, CD_MUNICIPIO), names_from = NR_TURNO, values_from = perc_bolsonaro) |>
+  rename(perc_bolso_turno1 = '1',
+         perc_bolso_turno2 = '2')
+```
+
+##### Criando modelo
+
+```{r}
+# modelo voto em Bolsonaro 1t prediz voto no 2t
+reg1 <- lm(perc_bolso_turno2 ~ perc_bolso_turno1, data = presid_al18_valido)
+
+summary(reg1)
+```
+
+##### Plotando a reta
+
+```{r}
+presid_al18_valido |>
+  ggplot(aes(x=perc_bolso_turno1, y=perc_bolso_turno2)) + geom_point() + 
+  geom_abline(slope = coef(reg1)[2] , intercept = coef(reg1)[1], colour  = "blue")
+```
+
+### 10.2.1 Resíduos contra o preditor
+
+Se os resíduos tiverem esperança condicional zero, isso implica que, para cada valor de $x_i$, os resíduos devem ter média zero.
+
+Visualmente, ao plotar os resíduos em relação aos valores preditos ($\hat{y}_i$) ou aos valores dos preditores ($x_i$), esperamos ver uma dispersão aleatória em torno de zero, sem seguir um padrão discernível. Isso se traduz em uma distribuição dos resíduos que não exibe tendências claras ou estruturas repetitivas em relação aos valores preditos.
+
+Em um gráfico de resíduos versus valores previstos, se os pontos se espalham aleatoriamente ao redor da linha zero (ou de outra linha horizontal), sem seguir um padrão sistemático (como, por exemplo, um padrão em forma de U ou funil), isso sugere que a condição de esperança condicional zero dos resíduos está sendo atendida.
+
+Em resumo, a ausência de um padrão claro nos gráficos dos resíduos em relação aos valores previstos é indicativa de que os resíduos têm média zero e atendem à condição de esperança condicional zero, o que é uma das premissas desejadas para um bom ajuste do modelo aos dados.
+
+```{r}
+df <- data.frame(residuos = residuals(reg1),
+                 preditor = presid_al18_valido$perc_bolso_turno1)
+
+df %>%
+  ggplot(aes(x=preditor, y = residuos)) + 
+  geom_point() + 
+  geom_smooth(method="lm", se=F) +
+  theme_classic()
+```
+
+```{r}
+par(mfrow = c(2,2))
+
+plot(reg1)
+```
+
+### 10.2.2 Magnitude dos Resíduos contra o Preditor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:::

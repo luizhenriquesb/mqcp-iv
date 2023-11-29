@@ -272,5 +272,4 @@ $y = a + b * x + c * x^2 + e$
 $y = a + b * x + c * x + e^d$
 
 "Vejam que o parâmetro $d$ entra exponenciado $e$, portanto, não linearmente."
-
 :::
