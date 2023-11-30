@@ -10,6 +10,7 @@ knitr::opts_knit$set(root.dir = here::here())
 ```
 
 ::: {style="text-align: justify"}
+
 ### Carregando pacotes
 
 ```{r, message=FALSE, warning=FALSE}

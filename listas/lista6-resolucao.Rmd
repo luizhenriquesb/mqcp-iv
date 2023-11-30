@@ -1,7 +1,11 @@
 ---
-title: "Untitled"
-output: pdf_document
-date: "2023-11-28"
+title: "Métodos Quantitativos IV - Lista 6 (resolução)"
+subtitle: "Departamento de Ciência Política da FFLCH-USP"
+author: 'Luiz Henrique da Silva Batista (Número USP: 12687228)'
+date: "2023-11-30"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -20,7 +24,6 @@ Essa a lista compreende questões sobre a verificação dos pressupostos do mode
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(janitor)
-library(tidymodels)
 library(stargazer)
 library(vroom)
 ```
@@ -79,9 +82,9 @@ Nosso modelo de regressão estima que a nota de matemática aumenta, em média, 
 
 Calcule os intervalos de confiança dos coeficientes.
 
-|     Intervalo de confiança de 95% para $\alpha$      |   Intervalo de confiança de 95% para $\beta$   |
-|:------------------------------------:|:--------------------------------:|
-| (`r 62.975 - 2 * 0.399`; `` r`62.975 + 2 * 0.399 ``) | (`r 0.905 - 2 * 0.001`; `r 0.905 + 2 * 0.001`) |
+|   Intervalo de confiança de 95% para $\alpha$    |   Intervalo de confiança de 95% para $\beta$   |
+|:-----------------------------------:|:---------------------------------:|
+| (`r 62.975 - 2 * 0.399`; `r 62.975 + 2 * 0.399`) | (`r 0.905 - 2 * 0.001`; `r 0.905 + 2 * 0.001`) |
 
 Por que o R utiliza a distribuição t (e não a distribuição normal) para as inferências?
 
@@ -100,15 +103,13 @@ df |>
   theme_classic()
 ```
 
-O gráfico acima permite demonstrar que $E[\hat{e}|X=x]=0$. Conforme os resíduos representam a diferença entre a previsão do modelo de regressão $\hat{y_i}$ e o valor observado $y_i$, uma média igual a 0 (zero), condicional a um dado conjunto de valores $X=x$, significa que nosso modelo 
+O gráfico acima permite demonstrar que $E[\hat{e}|X=x]=0$. Conforme os resíduos representam a diferença entre a previsão do modelo de regressão $\hat{y_i}$ e o valor observado $y_i$, uma média igual a 0 (zero), condicional a um dado conjunto de valores $X=x$, significa que nosso modelo
 
 Qual é a motivação desse teste? Em outras palavras, qual pressuposto do modelo linear gostaríamos de satistazer?
 
 O objetivo desse teste é satisfazer o pressuposto de que os resíduos devem ter esperança igual a zero, ou seja, que $E[\hat{e}|X=x]=0$.
 
 Qual é a consequência da violação desse pressuposto?
-
-
 
 ### Exercício 5
 
