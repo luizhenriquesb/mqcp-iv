@@ -41,13 +41,15 @@ Limpe os dados para a análise.
 
 ```{r, message=FALSE}
 enem_2022 <- vroom::vroom("datasets/microdados_enem_2022/DADOS/MICRODADOS_ENEM_2022.csv",
-                          quote = "", delim = ";") |> 
+                          quote = "", delim = ";") |>
   # Coloca em letras minúsculas os nomes das colunas 
   janitor::clean_names() |> 
-  # Seleciona somente as variáveis de interesse
-  dplyr::select(nu_inscricao, nu_nota_ch, nu_nota_mt) |> 
   # Removendo NA's
-  drop_na(nu_nota_ch, nu_nota_mt)
+  drop_na(nu_nota_ch, nu_nota_mt) |> 
+  # Selecionando 10000 observações aleatórias
+  sample_n(size = 10000) |> 
+  # Seleciona somente as variáveis de interesse
+  dplyr::select(nu_inscricao, nu_nota_ch, nu_nota_mt)
 ```
 
 Para a leitura da nossa base de dados utilizamos a função `vroom()`, do pacote `{vroom}`. A motivação se deve ao fato de que a velocidade de leitura dessa função é de 1,23GB/s, tornando-se excelente para importar bases grandes. Para mais informações sobre esse pacote, acesse [este link](https://vroom.r-lib.org/).
@@ -83,7 +85,7 @@ Nosso modelo de regressão estima que a nota de matemática aumenta, em média, 
 Calcule os intervalos de confiança dos coeficientes.
 
 |   Intervalo de confiança de 95% para $\alpha$    |   Intervalo de confiança de 95% para $\beta$   |
-|:-----------------------------------:|:---------------------------------:|
+|:------------------------------------------------:|:----------------------------------------------:|
 | (`r 62.975 - 2 * 0.399`; `r 62.975 + 2 * 0.399`) | (`r 0.905 - 2 * 0.001`; `r 0.905 + 2 * 0.001`) |
 
 Por que o R utiliza a distribuição t (e não a distribuição normal) para as inferências?
