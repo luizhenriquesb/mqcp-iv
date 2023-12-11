@@ -34,8 +34,7 @@ library(knitr)
 Nesta lista, utilizaremos os microdados do ENEM relativos a 2022. Faça o download dos dados do ENEM de 2022 e do dicionário de dados. Leia o dicionário de dados
 
 ```{r}
-# Link: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/
-# microdados/enem
+# Link: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/enem
 
 # Selecione as seguintes vari´aveis:
 ## NU_NOTA_CH
