@@ -10,7 +10,6 @@ knitr::opts_knit$set(root.dir = here::here())
 ```
 
 ::: {style="text-align: justify"}
-
 ### Carregando pacotes
 
 ```{r, message=FALSE, warning=FALSE}
@@ -63,26 +62,26 @@ Podemos baixar o arquivo clicando no [link](https://cdn.tse.jus.br/estatistica/s
 ##### Importando a base diretamente do TSE através da URL
 
 ```{r}
-# URL do arquivo ZIP que você quer baixar
-url <- "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2018_BR.zip"
-
-# Caminho para a pasta onde você quer salvar o arquivo
-caminho_destino <- "datasets/dados_tse_2018"
-
-# Nome do arquivo ZIP que será baixado
-arquivo_destino <- paste(caminho_destino, "/dados_tse_2018.zip", sep = "")
-
-# Aumentando o tempo limite
-options(timeout = 300)
-
-# Baixando o arquivo ZIP
-download.file(url, destfile = arquivo_destino, mode = "wb")
-
-# Descompactando o arquivo ZIP
-unzip(arquivo_destino, exdir = caminho_destino)
-
-# Excluindo o arquivo ZIP após descompactar
-file.remove(arquivo_destino)
+# # URL do arquivo ZIP que você quer baixar
+# url <- "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2018_BR.zip"
+# 
+# # Caminho para a pasta onde você quer salvar o arquivo
+# caminho_destino <- "datasets/dados_tse_2018"
+# 
+# # Nome do arquivo ZIP que será baixado
+# arquivo_destino <- paste(caminho_destino, "/dados_tse_2018.zip", sep = "")
+# 
+# # Aumentando o tempo limite
+# options(timeout = 300)
+# 
+# # Baixando o arquivo ZIP
+# download.file(url, destfile = arquivo_destino, mode = "wb")
+# 
+# # Descompactando o arquivo ZIP
+# unzip(arquivo_destino, exdir = caminho_destino)
+# 
+# # Excluindo o arquivo ZIP após descompactar
+# file.remove(arquivo_destino)
 ```
 
 ##### Investigando a nossa base
@@ -147,10 +146,12 @@ Em um gráfico de resíduos versus valores previstos, se os pontos se espalham a
 Em resumo, a ausência de um padrão claro nos gráficos dos resíduos em relação aos valores previstos é indicativa de que os resíduos têm média zero e atendem à condição de esperança condicional zero, o que é uma das premissas desejadas para um bom ajuste do modelo aos dados.
 
 ```{r}
+# Gráfico Resíduos contra o preditor
+
 df <- data.frame(residuos = residuals(reg1),
                  preditor = presid_al18_valido$perc_bolso_turno1)
 
-df %>%
+df |>
   ggplot(aes(x=preditor, y = residuos)) + 
   geom_point() + 
   geom_smooth(method="lm", se=F) +
@@ -165,19 +166,198 @@ plot(reg1)
 
 ### 10.2.2 Magnitude dos Resíduos contra o Preditor
 
+A "Magnitude dos Resíduos Contra o Preditor" se refere à relação entre os resíduos de um modelo estatístico (normalmente de regressão) e as variáveis independentes (ou preditoras) usadas no modelo.
 
+Quando se fala sobre a "magnitude" dos resíduos em relação ao preditor, está se avaliando a intensidade ou o tamanho desses resíduos em relação aos valores das variáveis independentes.
 
+Em uma análise de regressão, se os resíduos exibirem uma mudança significativa ou padrões distintos à medida que os valores dos preditores mudam, isso pode indicar:
 
+1.  **Heterocedasticidade:** Variação na dispersão dos resíduos conforme os valores dos preditores mudam. Por exemplo, a dispersão dos resíduos pode aumentar ou diminuir à medida que o valor de um preditor específico aumenta ou diminui.
 
+2.  **Não linearidade:** Se a relação entre os resíduos e os preditores não for linear, pode indicar que a forma funcional do modelo não está capturando adequadamente a relação entre as variáveis independentes e dependentes.
 
+Se essa magnitude estiver mudando sistematicamente com o preditor, isso sugere que o modelo pode não atender a algumas das suposições fundamentais da regressão linear, como homocedasticidade ou linearidade.
 
+Para chegar a homocedasticidade $\mathbb{Var}[\hat{e}|X] = \sigma^2$ vamos olhar para a esperança condicional do quadrado dos resíduos. E podemos fazer isso plotando o gráfico do quadrado dos resíduos contra o preditor.
 
+```{r}
+# Gráfico Magnitude dos Resíduos contra o Preditor
+df <- data.frame(residuos_sq = residuals(reg1)^2, 
+                 preditor = presid_al18_valido$perc_bolso_turno1)
 
+df |>
+  ggplot(aes(x=preditor, y = residuos_sq)) + 
+  geom_point() + 
+  geom_smooth(method="lm", se=F)
+```
 
+##### Interpretação
 
+"A reta deve ser horizontal, e não deveria ter mais pontos acima do que abaixo da reta. A altura da reta deveria ser aproximadamente o EQM. Conjuntos de pontos persistentemente acima ou abaixo da reta são sinais de problema com alguma de nossas hipóteses, ou há heterocedasticidade (a variância muda com o preditor) ou a forma funcional do modelo está errada de algum modo. No meu gráfico, a reta não é exatamente horizontal, mas talvez seja"good enough". Uma forma de olhar isso é computar erros padrões que lidem com a heterocedasticidade".
 
+##### Melhorando a interpretação
 
+"Ás vezes quando temos resíduos muito grandes, o quadrado deles fica gigante e o gráfico fica não-informativo (especialmente quando o modelo é problemático). Nesses casos, podemos plotar o valor absoluto dos resíduos, em vez do quadrado".
 
+```{r}
+# Plotando o valor absoluto dos resíduos, em vez do quadrado
+df <- data.frame(residuos_abs = abs(residuals(reg1)), 
+                 preditor = presid_al18_valido$perc_bolso_turno1)
 
+df |>
+  ggplot(aes(x=preditor, y = residuos_abs)) + geom_point() + geom_smooth(method="lm", se=F)
+```
 
+### 10.2.3 Resíduos com dados Temporais e/ou Espaciais
+
+1.  **Estrutura Temporal/Espacial dos Dados**
+
+-   Muitas vezes, os dados têm uma ordem específica, seja temporal (dados ao longo do tempo) ou espacial (dados de diferentes locais).
+-   Em modelos simples, essa ordem não deveria importar, assumindo que a amostra é independente e identicamente distribuída (i.i.d) e que os erros não são correlacionados entre si.
+
+2.  **Plot dos Resíduos Contra Tempo ou Espaço**
+
+-   No exemplo dado, há uma ordem espacial nos dados (identificada por seções).
+-   Faz-se um gráfico dos resíduos em relação a essa ordem espacial para verificar se há algum padrão ou correlação nos resíduos.
+
+```{r}
+# Plotando os Resíduos Contra o Espaço
+presid_al18_valido <- presid_al18_valido |>
+  mutate(id_secao = paste0(NR_SECAO, NR_ZONA , CD_MUNICIPIO))
+
+df <- data.frame(residuos = residuals(reg1), id = as.numeric(presid_al18_valido$id_secao))
+
+df |>
+  ggplot(aes(x=id, y = residuos)) + geom_point() + geom_smooth(method="lm", se=F)
+```
+
+3.  **Técnica de Permutação para Verificação**
+
+-   Uma técnica simples é o "permutation test" de forma simplificada, usando o pacote nullabor.
+-   A ideia é criar gráficos dos resíduos permutados aleatoriamente contra o tempo ou espaço (no caso, espaço).
+-   Essa técnica gera vários gráficos de resíduos permutados aleatoriamente e um gráfico com os resíduos reais. Observa-se se os resíduos reais se destacam ou se comportam de maneira diferente dos resíduos permutados, o que indicaria a presença de algum padrão não aleatório nos resíduos reais.
+
+```{r, warning=FALSE}
+library(nullabor)
+
+# Aleatoriza do mesmo jeito sempre
+set.seed(1234)
+
+elec_reg <- data.frame(
+  # df já existente
+  presid_al18_valido,
+  # nova coluna: residuos do modelo reg1
+  .resid = residuals(reg1), 
+  # nova coluna: valores preditos pelo modelo para cada observação
+  .fitted = fitted(reg1)
+  )
+
+# Teste de permutação
+shuffled_residuals <- lineup(
+  # Cria modelo de reg linear
+  null_lm(perc_bolso_turno2 ~ perc_bolso_turno1, 
+          # especifica metodo de permitação do teste
+          method = "rotate"), 
+  # elec_reg contém os valores originais, os residuos reais e os valores previstos
+  true = elec_reg,
+  # nove permutações
+  n = 9
+  )
+
+## decrypt("ve5B DEyE l6 GuClylu6 dT")
+
+ggplot(shuffled_residuals, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  facet_wrap(vars(.sample))
+```
+
+Como podemos ver, dá para identificar que o plot 2 é diferente do resto. E de fato, ele é o original. Isso significa que existe algum padrão nos resíduos que não estamos levando em consideração.
+
+### 10.3 Normalidade dos resíduos
+
+Esse texto trata da verificação da normalidade dos resíduos em um modelo de regressão linear e descreve duas maneiras de avaliar a normalidade dos resíduos.
+
+"Se estamos supondo normalidade dos resíduos, podemos verificar se são de fato normais. Uma forma de verificar é plotando o histograma dos resíduos e por cima a densidade de uma distribuição normal com média zero (resíduos têm média zero) e desvio-padrão igual ao desvio-padrão dos resíduos".
+
+1.  **Histograma e Densidade**
+
+-   Primeiramente, é plotado um histograma dos resíduos com a sobreposição da densidade de uma distribuição normal com média zero e desvio-padrão igual ao desvio-padrão dos resíduos.
+-   A ideia é visualizar se a distribuição dos resíduos se assemelha a uma distribuição normal. Se os resíduos seguirem essa distribuição, o histograma se aproximará da curva de densidade teórica.
+
+```{r, warning=FALSE}
+df <- data.frame(residuos = residuals(reg1),
+                 preditor = presid_al18_valido$perc_bolso_turno1, 
+                 density_points = rnorm(length(residuals(reg1)) , 
+                                        0, 
+                                        sd(residuals(reg1)))
+                 )
+
+print(sd(residuals(reg1)))
+
+df |>
+  ggplot(aes(residuos)) + geom_histogram(aes(y=..density..)) +
+  geom_density(aes(density_points), colour = "blue")
+```
+
+2.  **Q-Q Plot (Quantile-Quantile Plot)**
+
+-   Em seguida, é explicado o conceito de Q-Q plot, que compara os quantis (pontos que dividem a distribuição em partes iguais) dos resíduos com os quantis de uma distribuição normal teórica.
+-   No exemplo, é mostrado um Q-Q plot simples entre duas variáveis ordenadas, onde a comparação de seus quantis gera uma linha reta de 45 graus se elas seguirem a mesma distribuição.
+-   Em seguida, é descrito o uso do Q-Q plot para os resíduos de uma regressão. Apresenta-se um Q-Q plot usando a função do R (qqnorm) e a linha de referência teórica (qqline) que representa a distribuição normal.
+-   A observação é que se os resíduos seguirem uma distribuição normal, eles devem se alinhar aproximadamente com a linha de referência, sem padrões significativos ou desvios marcantes.
+
+```{r}
+x <- rnorm( 1000)
+
+q50 <- quantile(x, .5)
+q025 <- quantile(x, .025)
+q975 <-quantile(x, .975)
+
+print(c(q50, q025, q975))
+```
+
+```{r}
+y <- rnorm(1000)
+
+df <- data.frame(y=y, x=x)
+
+# plot de x contra y
+df %>%
+  ggplot(aes(x=x, y=y)) + 
+  geom_point()
+```
+
+```{r}
+# plot de x ordenado contra y ordenado
+df %>%
+  ggplot(aes(x=sort(x), y=sort(y))) + geom_point() +  geom_abline(intercept = 0, slope = 1, colour ="blue")
+```
+
+```{r}
+df <- data.frame(residuos = residuals(reg1), preditor = presid_al18_valido$perc_bolso_turno1, 
+                 density_points = rnorm(length(residuals(reg1)) , 0, sd(residuals(reg1))),
+                 fi_percentil = 1:length(residuals(reg1))/1:length(residuals(reg1)))
+
+print(sd(residuals(reg1)))
+```
+
+```{r}
+# plot de x ordenado contra y ordenado
+df %>%
+  ggplot(aes(y=sort(residuos), x=sort(density_points))) + geom_point() +
+  geom_abline(intercept = 0, slope = 1, colour ="blue")
+```
+
+```{r}
+qqnorm(residuals(reg1))
+qqline(residuals(reg1))
+```
+
+### 10.4 Erro padrão robusto
+
+Uma possibilidade é que tenha heterocedasticidade.
+
+### 10.5 Heterocedasticidade
+
+A heterocedasticidade surge quando a variabilidade dos erros (ou resíduos) em um modelo estatístico varia de acordo com os valores das variáveis independentes, também conhecidas como preditores. Em outras palavras, a dispersão dos erros não é constante em toda a faixa de valores das variáveis independentes.
 :::
