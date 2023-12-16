@@ -1,5 +1,5 @@
 ---
-title: "Métodos Quantitativos IV - Lista 6 (resolução)"
+title: "Métodos Quantitativos IV - Lista 7 (resolução)"
 subtitle: "Departamento de Ciência Política da FFLCH-USP"
 author: 'Luiz Henrique da Silva Batista (Número USP: 12687228)'
 date: "2023-12-19"
@@ -10,9 +10,11 @@ fontsize: 12pt
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
+knitr::opts_chunk$set(eval = FALSE)
 ```
 
 ::: {style="text-align: justify"}
+Esta lista compreende questões sobre regressão linear múltipla. **Os alunos devem entregar um arquivo PDF contendo as respostas e o script para replicação.**
 
 ```{r}
 # Material de apoio para esta lista:
@@ -31,12 +33,12 @@ library(knitr)
 
 ## Exercício 1
 
-Nesta lista, utilizaremos os microdados do ENEM relativos a 2022. Faça o download dos dados do ENEM de 2022 e do dicionário de dados. Leia o dicionário de dados
+Nesta lista, utilizaremos os microdados do ENEM relativos a 2022. Faça o download dos dados do ENEM de 2022 e do dicionário de dados. Leia o dicionário de dados.
 
 ```{r}
 # Link: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/enem
 
-# Selecione as seguintes vari´aveis:
+# Selecione as seguintes variáveis:
 ## NU_NOTA_CH
 ## NU_NOTA_MT
 ## NU_NOTA_CN
@@ -44,12 +46,6 @@ Nesta lista, utilizaremos os microdados do ENEM relativos a 2022. Faça o downlo
 ## TP_SEXO
 ## TP_COR_RACA
 ## TP_ESCOLA
-```
-
-Limpe os dados para a análise. Para resolver as questões, utilize uma amostra aleatória com 10.000 observações. Lmebre-se de utilizar a função `set.seed()`. Verifique como as variáveis estão codificadas e faã os ajustes necessários para a análise.
-
-```{r, warning=FALSE, message=FALSE}
-set.seed(123)
 
 # setwd(dir = "C:\\sua\\estrutura\\de\\pastas\\no\\windows")
 # setwd(dir = "C:/sua/estrutura/de/pastas/no/linux/ou/mac")
@@ -57,13 +53,21 @@ set.seed(123)
 # Importando os dados
 df <- vroom("datasets/microdados_enem_2022/DADOS/MICRODADOS_ENEM_2022.csv",
             delim = ";")
+```
+
+Limpe os dados para a análise. Para resolver as questões, utilize uma amostra aleatória com 10.000 observações. Lmebre-se de utilizar a função `set.seed()`.
+
+Verifique como as variáveis estão codificadas e faça os ajustes necessários para a análise.
+
+```{r, warning=FALSE, message=FALSE}
+set.seed(123)
 
 # Limpando os dados
 dados <- df |> 
   # Limpa o nome das colunas
   janitor::clean_names() |> 
   # Seleciona somente as colunas de interesse
-  select(nu_nota_ch, nu_nota_mt, nu_nota_cn, nu_nota_lc,
+  select(nu_nota_mt, nu_nota_ch, nu_nota_cn, nu_nota_lc,
          tp_sexo, tp_cor_raca, tp_escola) |> 
   # Remove valores ausentes
   drop_na() |> 
@@ -73,5 +77,45 @@ dados <- df |>
 # Verificando a codificação das variaveis
 # glimpse(dados)
 ```
-:::
 
+## Exercício 2
+
+Utilize as demais variáveis selecionadas para prever a nota de matemática por meio de uma regressão linear múltipla.
+
+```{r}
+# Modelo
+reg <- lm(nu_nota_mt ~ nu_nota_ch + nu_nota_cn + nu_nota_lc + tp_sexo + tp_cor_raca + tp_escola, data = dados)
+```
+
+Escreva a equação da regressão em notação escalar e em notação matricial.
+
+Apresente os resultados da regressão em uma tabela (stargazer) (PÓS).
+
+```{r}
+stargazer::stargazer(reg,
+                     type = "latex",
+                     style = "ajps",
+                     title = "Regressão múltipla",
+                     single.row = T, 
+                     keep.stat = c("n"),
+                     dep.var.labels = "Nota em matemática",
+                     header = F,
+                     dep.var.caption= "")
+```
+
+## Exercício 3
+
+Interprete o coeficiente estimado para cada uma das variáveis. Para as variáveis categóricas, qual é a categoria de referência? Explique o significado do coeficiente de cada categoria. Mude a categoria de referência e verifique se sua interpretação se altera.
+
+## Exercício 4
+
+Discuta as diferenças entre o modelo da lista 6 (com apenas uma variável independente) e o modelo desta lista (múltiplas variáveis independentes).
+
+## Exercício 5
+
+Analise a plausibilidade da satisfação dos pressupostos do modelo linear. Analise a performance preditiva do modelo.
+
+## Exercício 6
+
+Apresente seus resultados em um arquivo PDF. Garanta que seu arquivo esteja limpo, contendo as respostas, os gráficos e as tabelas, mas não eventuais mensagens e erros. O arquivo PDF pode ser gerado diretamente a partir do R por meio do RMarkdown ou do RSweave. Para os alunos de graduação, isso é recomendado, mas não obrigatório. Adicionalmente, forneça o script para replicação.
+:::
