@@ -185,7 +185,7 @@ stargazer::stargazer(reg,
 
 Interprete o coeficiente estimado para cada uma das variáveis. Para as variáveis categóricas, qual é a categoria de referência? Explique o significado do coeficiente de cada categoria. Mude a categoria de referência e verifique se sua interpretação se altera.
 
-**R:** Vamos fazer uma interpretação em partes, começando pelo intercepto, passando pelas variáveis numéricas e terminando com as variáveis categóricas
+**R:** Vamos fazer uma interpretação em partes, começando pelo intercepto, passando pelas variáveis numéricas e terminando com as variáveis categóricas.
 
 ### Intercepto
 
@@ -213,7 +213,7 @@ No caso da variável *raça*, não tivemos coeficientes estatisticamente signifi
 
 Por fim, para a variável *tipo de escola*, o modelo estima que a nota em matemática:
 
--   diminui cerca de `r round(coef(reg)[9], 3) * -1` em relação a candidatos de escolas privadas (categoria de referência)
+-   diminui cerca de `r round(coef(reg)[9], 3) * -1` em relação a candidatos de escolas privadas (categoria de referência).
 
 ### Alterando a categoria de referência
 
@@ -257,7 +257,7 @@ Para a variável *sexo*, temos um coeficiente com sinal invertido agora:
 
 Para a variável *raça*, no modelo 1 os coeficientes para as categorias *branca*,*indígena* e *negra* não foram estatisticamente significativos quando comparados à categoria de referência *amarela*. No modelo 2, mudamos a categoria de referência para *branca* e o coeficiente estimado para *negra* deu estatisticamente significante:
 
--   A nota de matemática é cerca de `r round(coef(reg2)[8], 3) * -1` menor em relação à *branca* (mantendo tudo o mais constante)
+-   A nota de matemática é cerca de `r round(coef(reg2)[8], 3) * -1` menor em relação à *branca* (mantendo tudo o mais constante).
 
 ## Exercício 4
 
@@ -281,7 +281,7 @@ Aqui, os pontos deeriam se espalhar aleatoriamente ao redor da linha linha horiz
 
 ```{r, fig.align='center', fig.height=4, fig.width=6}
 ggplot() +
-  aes(x = reg$fitted.values, y = resid(reg2)) +
+  aes(x = reg2$fitted.values, y = resid(reg2)) +
   labs(
     title = "Resíduos vs. Valores Ajustados",
     subtitle = "Amostra de 10 mil casos aleatórios",
@@ -298,7 +298,7 @@ Aqui, estamos testando a homocedasticidade dos resíduos. Para satisfazer esse p
 
 ```{r, fig.align='center', fig.height=4, fig.width=6}
 ggplot() +
-  aes(x = reg$fitted.values, y = resid(reg2)^2) +
+  aes(x = reg2$fitted.values, y = resid(reg2)^2) +
   labs(
     title = "Magnitude dos resíduos",
     subtitle = "Seleção de 10 mil casos aleatórios",
@@ -312,6 +312,8 @@ ggplot() +
 
 ### Normalidade dos erros
 
+O modelo satisfaz o pressuposto de normalidade dos erros
+
 ```{r, fig.align='center', fig.height=4, fig.width=6}
 qqnorm(residuals(reg2))
 qqline(residuals(reg2))
@@ -323,7 +325,7 @@ qqline(residuals(reg2))
 vif(reg2) |> knitr::kable()
 ```
 
-A tabela VIF acima indica a presença de multicolinearidade entre as variáveis independentes. Existe uma problema de multicolinearidade quando este vif estiver acima de 10
+A tabela VIF acima indica a presença de multicolinearidade entre as variáveis independentes. Existe uma problema de multicolinearidade quando este vif estiver acima de 10.
 
 - As variáveis `nu_nota_ch` e `nu_nota_lc` apresentam uma influência moderada da multicolinearidade em suas estimativas.
 - As demais variáveis (`nu_nota_cn`, `tp_sexo`, `tp_cor_raca`, `tp_escola`) têm baixa influência da multicolinearidade em seus coeficientes estimados.

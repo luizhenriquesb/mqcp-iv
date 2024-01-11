@@ -158,7 +158,6 @@ residuos |>
     x = "Preditor",
     y = "Resíduos"
   )
-  
 ```
 
 **R:** O gráfico acima demonstra que $E[\hat{e}|X=x]=0$. Conforme os resíduos representam a diferença entre a previsão do modelo de regressão $\hat{y_i}$ e o valor observado $y_i$ (Galdino, 2023), uma média igual a 0 (zero), condicionada a um dado conjunto de valores aleatórios $X=x$, significa que nosso modelo não está "tendencioso", atribuindo mais (ou menos) peso a determinados valores. Em outras palavras, $E[\hat{e}|X=x]=0$ deveria significar que não estamos percebendo nenhum padrão claro em uma dada distribuição aleatória dos nossos dados.
